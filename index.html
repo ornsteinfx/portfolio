@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ornstein — Photography & Design</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav id="nav">
+      <a href="#home" class="nav-logo">ORNSTEIN</a>
+      <div class="nav-links">
+        <a href="#work" class="nav-link">Work</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#contact" class="nav-link">Contact</a>
+        <a href="/admin" class="nav-admin-link">Admin</a>
+      </div>
+      <button class="nav-menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span></button>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#work" class="mobile-link">Work</a>
+      <a href="#about" class="mobile-link">About</a>
+      <a href="#contact" class="mobile-link">Contact</a>
+      <a href="/admin" class="mobile-link" style="font-size: 18px; color: var(--text-muted)">Admin</a>
+    </div>
+
+    <section id="home" class="hero">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="hero-line" data-reveal>Photography</span>
+          <span class="hero-line hero-amp" data-reveal>&</span>
+          <span class="hero-line" data-reveal>Graphic Design</span>
+        </h1>
+        <p class="hero-sub" data-reveal>@ornstein.jpg &nbsp;·&nbsp; @ornstein.fx</p>
+      </div>
+      <div class="hero-scroll" data-reveal>
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+
+    <section id="work" class="work">
+      <div class="section-header">
+        <h2 class="section-title" data-reveal>Selected Work</h2>
+        <div class="controls" data-reveal>
+          <div class="filters" id="filters"></div>
+          <div class="sort-wrap">
+            <button class="sort-btn" id="sortBtn">
+              Newest First
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M3 4.5L6 7.5L9 4.5" />
+              </svg>
+            </button>
+            <div class="sort-dropdown" id="sortDropdown">
+              <button class="sort-option active" data-sort="newest">Newest First</button>
+              <button class="sort-option" data-sort="oldest">Oldest First</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="gallerySections"></div>
+    </section>
+
+    <section id="about" class="about">
+      <div class="about-grid">
+        <div class="about-text" data-reveal>
+          <h2 class="section-title">About</h2>
+          <p class="about-body">
+            Visual storyteller based in New Jersey. I capture moments through photography and craft bold graphics for
+            brands, athletes, and events. My work spans sports photography, editorial portraits, brand identity, and
+            social media content.
+          </p>
+          <div class="about-accounts">
+            <a href="https://www.instagram.com/ornstein.jpg/" target="_blank" rel="noopener" class="account-link">
+              <span class="account-handle">@ornstein.jpg</span>
+              <span class="account-label">Photography</span>
+            </a>
+            <a href="https://www.instagram.com/ornstein.fx/" target="_blank" rel="noopener" class="account-link">
+              <span class="account-handle">@ornstein.fx</span>
+              <span class="account-label">Graphic Design</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact">
+      <div class="contact-inner" data-reveal>
+        <h2 class="section-title">Get In Touch</h2>
+        <p class="contact-text">Open to freelance, collaborations, and full-time opportunities.</p>
+        <a href="mailto:ornstein.fx@gmail.com" class="contact-email">ornstein.fx@gmail.com</a>
+        <div class="contact-socials">
+          <a href="https://www.instagram.com/ornstein.jpg/" target="_blank" rel="noopener">Instagram (Photo)</a>
+          <a href="https://www.instagram.com/ornstein.fx/" target="_blank" rel="noopener">Instagram (Design)</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>&copy; 2025 Ornstein. All rights reserved.</span>
+    </footer>
+
+    <div class="lightbox" id="lightbox">
+      <button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+      <img class="lightbox-img" id="lightboxImg" src="" alt="" />
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

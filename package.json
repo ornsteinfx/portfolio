@@ -1,0 +1,8 @@
+{
+  "name": "ornstein-portfolio",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "bun run server.js",
+    "start": "bun run server.js"
+  }
+}

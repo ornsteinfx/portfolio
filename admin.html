@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin — Ornstein Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav>
+      <a href="/" class="nav-logo">ORNSTEIN</a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">View Site</a>
+      </div>
+    </nav>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay open" id="loginModal">
+      <div class="modal">
+        <h2>Admin Access</h2>
+        <p>Enter your password to manage the portfolio.</p>
+        <input type="password" id="passwordInput" placeholder="Password" autofocus />
+        <div class="modal-error" id="loginError">Incorrect password</div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="loginBtn">Unlock</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+      <div class="admin-header">
+        <h1 class="admin-title">Manage Portfolio</h1>
+        <div class="admin-actions">
+          <a href="/" class="btn">View Site</a>
+          <button class="btn" id="refreshBtn">Refresh</button>
+        </div>
+      </div>
+
+      <div class="upload-zone" id="uploadZone">
+        <span class="upload-icon">+</span>
+        <p>Drag & drop images here, or click to browse</p>
+        <div class="upload-category-select">
+          <label for="uploadCat">Category:</label>
+          <select id="uploadCat"></select>
+        </div>
+        <input type="file" id="fileInput" multiple accept="image/*" style="display: none" />
+      </div>
+
+      <div class="admin-grid" id="adminGrid"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      let token = null
+
+      const loginModal = document.getElementById("loginModal")
+      const adminPanel = document.getElementById("adminPanel")
+      const passwordInput = document.getElementById("passwordInput")
+      const loginBtn = document.getElementById("loginBtn")
+      const loginError = document.getElementById("loginError")
+      const uploadZone = document.getElementById("uploadZone")
+      const fileInput = document.getElementById("fileInput")
+      const uploadCat = document.getElementById("uploadCat")
+      const adminGrid = document.getElementById("adminGrid")
+      const toast = document.getElementById("toast")
+
+      // Toast
+      function showToast(msg) {
+        toast.textContent = msg
+        toast.classList.add("show")
+        setTimeout(() => toast.classList.remove("show"), 2500)
+      }
+
+      // Login
+      loginBtn.addEventListener("click", async () => {
+        const pw = passwordInput.value
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: pw }),
+        })
+        const data = await res.json()
+        if (data.ok) {
+          token = data.token
+          loginModal.classList.remove("open")
+          adminPanel.classList.add("visible")
+          loadCategories()
+          loadGallery()
+        } else {
+          loginError.style.display = "block"
+          passwordInput.value = ""
+          passwordInput.focus()
+        }
+      })
+
+      passwordInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") loginBtn.click()
+      })
+
+      // Load categories for upload dropdown
+      async function loadCategories() {
+        const res = await fetch("/api/categories")
+        const cats = await res.json()
+        uploadCat.innerHTML = ""
+        cats.forEach((c) => {
+          const opt = document.createElement("option")
+          opt.value = c
+          opt.textContent = c
+          uploadCat.appendChild(opt)
+        })
+      }
+
+      // Load gallery
+      async function loadGallery() {
+        const res = await fetch("/api/portfolio?sort=newest")
+        const items = await res.json()
+        adminGrid.innerHTML = ""
+        items.forEach((item) => {
+          const card = document.createElement("div")
+          card.className = "admin-card"
+          card.innerHTML = `
+          <img src="assets/${item.path}" alt="${item.name}" loading="lazy">
+          <div class="admin-card-info">
+            <div class="admin-card-name">${item.name}</div>
+            <div class="admin-card-meta">${item.category} — ${new Date(item.date).toLocaleDateString()}</div>
+          </div>
+          <button class="admin-card-delete" title="Delete">&times;</button>
+        `
+          card.querySelector(".admin-card-delete").addEventListener("click", async (e) => {
+            e.stopPropagation()
+            if (!confirm(`Delete "${item.name}"?`)) return
+            const res = await fetch(`/api/delete/${item.path}`, {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            if (res.ok) {
+              card.remove()
+              showToast("Deleted")
+            }
+          })
+          adminGrid.appendChild(card)
+        })
+      }
+
+      // Upload
+      uploadZone.addEventListener("click", () => fileInput.click())
+      uploadZone.addEventListener("dragover", (e) => {
+        e.preventDefault()
+        uploadZone.classList.add("dragover")
+      })
+      uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("dragover"))
+      uploadZone.addEventListener("drop", (e) => {
+        e.preventDefault()
+        uploadZone.classList.remove("dragover")
+        handleFiles(e.dataTransfer.files)
+      })
+      fileInput.addEventListener("change", () => handleFiles(fileInput.files))
+
+      async function handleFiles(files) {
+        const category = uploadCat.value
+        for (const file of files) {
+          const form = new FormData()
+          form.append("file", file)
+          form.append("category", category)
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: form,
+          })
+          const data = await res.json()
+          if (data.ok) showToast(`Uploaded: ${file.name}`)
+          else showToast(`Failed: ${file.name}`)
+        }
+        fileInput.value = ""
+        loadGallery()
+      }
+
+      document.getElementById("refreshBtn").addEventListener("click", () => {
+        loadCategories()
+        loadGallery()
+        showToast("Refreshed")
+      })
+    </script>
+  </body>
+</html>
