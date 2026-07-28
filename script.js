@@ -4,10 +4,15 @@ let currentFilter = "all"
 
 // ─── FETCH PORTFOLIO ───
 async function fetchPortfolio() {
-  const res = await fetch(`/api/portfolio?sort=${currentSort}`)
+  const res = await fetch(`/portfolio.json`)
   allItems = await res.json()
+  sortItems()
   renderFilters()
   renderGallery()
+}
+
+function sortItems() {
+  allItems.sort((a, b) => (currentSort === "oldest" ? a.date - b.date : b.date - a.date))
 }
 
 // ─── RENDER FILTER BUTTONS ───
@@ -165,7 +170,8 @@ document.querySelectorAll(".sort-option").forEach((opt) => {
     opt.classList.add("active")
     sortBtn.childNodes[0].textContent = opt.textContent + " "
     sortDropdown.classList.remove("open")
-    fetchPortfolio()
+    sortItems()
+    renderGallery()
   })
 })
 
