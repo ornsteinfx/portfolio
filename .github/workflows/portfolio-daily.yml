@@ -1,0 +1,23 @@
+name: Regenerate portfolio
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: node .github/scripts/generate-portfolio.js
+      - run: |
+          git config user.name "ornsteinfx"
+          git config user.email "ornstein.fx@gmail.com"
+          git add docs/portfolio.json
+          git diff --cached --quiet || git commit -m "Daily portfolio regeneration"
+          git push
