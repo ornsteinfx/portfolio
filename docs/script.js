@@ -466,6 +466,12 @@ document.getElementById("adminFileInput")?.addEventListener("change", async (e) 
     const repoPath = `${ASSETS_PREFIX}/${cat.replace(/\/$/, "")}/${file.name}`
     try {
       await commitFile(repoPath, b64, `Upload ${file.name}`)
+      allItems.push({
+        name: file.name.replace(/\.[^.]+$/, ""),
+        path: `${cat}/${file.name}`,
+        category: cat,
+        date: Date.now(),
+      })
       adminToast(`Uploaded: ${file.name}`)
     } catch (err) {
       adminToast(`Failed: ${file.name} - ${err.message}`)
@@ -495,6 +501,12 @@ au.addEventListener("drop", async (e) => {
     const repoPath = `${ASSETS_PREFIX}/${cat}/${file.name}`
     try {
       await commitFile(repoPath, b64, `Upload ${file.name}`)
+      allItems.push({
+        name: file.name.replace(/\.[^.]+$/, ""),
+        path: `${cat}/${file.name}`,
+        category: cat,
+        date: Date.now(),
+      })
       adminToast(`Uploaded: ${file.name}`)
     } catch (err) {
       adminToast(`Failed: ${file.name} - ${err.message}`)
