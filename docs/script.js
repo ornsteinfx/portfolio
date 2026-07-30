@@ -405,6 +405,7 @@ async function ghApi(method, path, body) {
     const err = await res.json().catch(() => ({}))
     throw new Error(err.message || `HTTP ${res.status}`)
   }
+  if (res.status === 204) return
   return res.json()
 }
 
