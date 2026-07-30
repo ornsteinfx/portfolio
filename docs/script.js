@@ -105,9 +105,10 @@ function renderGallery() {
   })
 }
 
-function createGalleryItem(item, index) {
+function createGalleryItem(item) {
   const el = document.createElement("div")
   el.className = "gallery-item"
+  el.dataset.path = item.path
   const dateStr = new Date(item.date).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
@@ -407,9 +408,13 @@ async function ghApi(method, path, body) {
   return res.json()
 }
 
+function enc(p) {
+  return p.split("/").map(encodeURIComponent).join("/")
+}
+
 async function getSha(path) {
   try {
-    const d = await ghApi("GET", `/repos/${REPO}/contents/${path}?ref=${BRANCH}`)
+    const d = await ghApi("GET", `/repos/${REPO}/contents/${enc(path)}?ref=${BRANCH}`)
     return d.sha
   } catch {
     return null
@@ -418,7 +423,7 @@ async function getSha(path) {
 
 async function commitFile(path, content, msg) {
   const sha = await getSha(path)
-  return ghApi("PUT", `/repos/${REPO}/contents/${path}`, {
+  return ghApi("PUT", `/repos/${REPO}/contents/${enc(path)}`, {
     message: msg,
     content: btoa(content),
     sha: sha || undefined,
@@ -429,7 +434,7 @@ async function commitFile(path, content, msg) {
 async function deleteFile(path, msg) {
   const sha = await getSha(path)
   if (!sha) return
-  return ghApi("DELETE", `/repos/${REPO}/contents/${path}`, {
+  return ghApi("DELETE", `/repos/${REPO}/contents/${enc(path)}`, {
     message: msg,
     sha,
     branch: BRANCH,
@@ -499,12 +504,11 @@ au.addEventListener("drop", async (e) => {
 })
 
 async function publishPortfolio() {
-  // Regenerate portfolio.json from the live data
   const items = allItems.map((i) => ({
     name: i.name,
     path: i.path,
     category: i.category,
-    date: Date.now(),
+    date: i.date,
   }))
   const json = JSON.stringify(items)
   try {
@@ -518,24 +522,24 @@ async function publishPortfolio() {
 // Add delete buttons
 function addAdminUI() {
   document.querySelectorAll(".admin-del").forEach((el) => el.remove())
-  document.querySelectorAll(".gallery-item").forEach((el, i) => {
+  document.querySelectorAll(".gallery-item").forEach((el) => {
     const del = document.createElement("button")
     del.className = "admin-del"
     del.textContent = "×"
     del.addEventListener("click", async (e) => {
       e.stopPropagation()
-      const item = allItems[i]
+      const idx = allItems.findIndex((x) => x.path === el.dataset.path)
+      if (idx === -1) return
+      const item = allItems[idx]
       if (!confirm(`Delete "${item.name}"?`)) return
-      const before = allItems.length
-      allItems = allItems.filter((_, idx) => idx !== i)
-      if (allItems.length === before) return
+      allItems.splice(idx, 1)
       const repoPath = `${ASSETS_PREFIX}/${item.path}`
       try {
         await deleteFile(repoPath, `Delete ${item.path}`)
         adminToast("Deleted. Publishing...")
       } catch (err) {
         adminToast(`Delete from repo failed: ${err.message}`)
-        allItems.splice(i, 0, item)
+        allItems.splice(idx, 0, item)
         return
       }
       renderGallery()
