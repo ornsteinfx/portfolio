@@ -286,6 +286,40 @@ nav.hidden {
   flex-wrap: wrap;
 }
 
+/* ─── SECTION FILTERS ─── */
+.section-filters {
+  display: flex;
+  gap: 8px;
+  padding: 0 40px 24px;
+}
+
+.section-filter-btn {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 100px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+}
+
+.section-filter-btn:hover {
+  color: var(--text);
+  background: var(--border);
+}
+
+.section-filter-btn.active {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.section-filter-btn.active:hover {
+  opacity: 0.85;
+}
+
 /* ─── FILTERS ─── */
 .filters {
   display: flex;
@@ -1003,6 +1037,10 @@ nav.hidden {
     padding: 80px 24px 32px;
     flex-direction: column;
     gap: 20px;
+  }
+
+  .section-filters {
+    padding: 0 24px 20px;
   }
 
   .controls {

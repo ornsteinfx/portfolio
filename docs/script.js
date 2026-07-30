@@ -1,12 +1,18 @@
 let allItems = []
 let currentSort = "newest"
 let currentFilter = "all"
+let currentSection = "all"
+
+function isPhoto(cat) {
+  return cat.startsWith("Photography") || cat.startsWith("photography")
+}
 
 // ─── FETCH PORTFOLIO ───
 async function fetchPortfolio() {
   const res = await fetch(`portfolio.json`)
   allItems = await res.json()
   sortItems()
+  renderSectionFilters()
   renderFilters()
   renderGallery()
 }
@@ -15,9 +21,34 @@ function sortItems() {
   allItems.sort((a, b) => (currentSort === "oldest" ? a.date - b.date : b.date - a.date))
 }
 
+// ─── SECTION FILTERS ───
+function renderSectionFilters() {
+  const el = document.getElementById("sectionFilters")
+  el.innerHTML = ""
+  ;["all", "Photography", "Graphic Design"].forEach((s) => {
+    const btn = document.createElement("button")
+    btn.className = "section-filter-btn"
+    if (s === currentSection) btn.classList.add("active")
+    btn.textContent = s === "all" ? "All" : s
+    btn.addEventListener("click", () => {
+      currentSection = s
+      document.querySelectorAll(".section-filter-btn").forEach((b) => b.classList.remove("active"))
+      btn.classList.add("active")
+      currentFilter = "all"
+      document.querySelectorAll(".filter-btn").forEach((b) => b.classList.toggle("active", b.dataset.filter === "all"))
+      renderFilters()
+      renderGallery()
+    })
+    el.appendChild(btn)
+  })
+}
+
 // ─── RENDER FILTER BUTTONS ───
 function renderFilters() {
-  const cats = [...new Set(allItems.map((i) => i.category))].sort()
+  let cats = [...new Set(allItems.map((i) => i.category))].sort()
+
+  if (currentSection === "Photography") cats = cats.filter(isPhoto)
+  else if (currentSection === "Graphic Design") cats = cats.filter((c) => !isPhoto(c))
   const filtersEl = document.getElementById("filters")
   filtersEl.innerHTML = ""
 
@@ -53,7 +84,12 @@ function renderGallery() {
   const sections = document.getElementById("gallerySections")
   sections.innerHTML = ""
 
-  const filtered = currentFilter === "all" ? allItems : allItems.filter((i) => i.category === currentFilter)
+  const sectionFiltered =
+    currentSection === "all"
+      ? allItems
+      : allItems.filter((i) => (currentSection === "Photography" ? isPhoto(i.category) : !isPhoto(i.category)))
+  const filtered =
+    currentFilter === "all" ? sectionFiltered : sectionFiltered.filter((i) => i.category === currentFilter)
 
   if (currentFilter === "all") {
     // Group by category
