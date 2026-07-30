@@ -362,7 +362,7 @@ tm.id = "adminTokenModal"
 tm.innerHTML = `
   <div class="modal-box">
     <h3>GitHub Token Required</h3>
-    <p>To upload and delete photos, create a <a href="https://github.com/settings/tokens?type=fine-grained" target="_blank">fine-grained PAT</a> with <b>Contents: Read/Write</b> permission for <b>ornsteinfx/portfolio</b>. Paste it below (stored locally in your browser).</p>
+    <p>To upload and delete photos, create a <a href="https://github.com/settings/tokens?type=fine-grained" target="_blank">fine-grained PAT</a> with <b>Contents: Read/Write</b> and <b>Actions: Read/Write</b> permissions for <b>ornsteinfx/portfolio</b>. Paste it below (stored locally in your browser).</p>
     <input type="password" id="adminTokenInput" placeholder="github_pat_...">
     <div class="btn-row">
       <button class="btn-primary" id="adminTokenSave">Save Token</button>
