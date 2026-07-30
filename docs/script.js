@@ -333,7 +333,7 @@ document.head.appendChild(adminStyles)
 // Inject admin bar
 const ab = document.createElement("div")
 ab.className = "admin-bar"
-ab.innerHTML = `ADMIN MODE <span><button id="adminPublishBtn">Publish Changes</button> <button id="adminExitBtn">Exit</button></span>`
+ab.innerHTML = `ADMIN MODE <span><button id="adminUpdateBtn">Update Now</button><button id="adminPublishBtn">Publish Changes</button> <button id="adminExitBtn">Exit</button></span>`
 document.body.prepend(ab)
 
 // Inject upload widget
@@ -603,6 +603,16 @@ document.getElementById("adminTokenCancel")?.addEventListener("click", () => {
 document.getElementById("adminExitBtn")?.addEventListener("click", exitAdmin)
 
 document.getElementById("adminPublishBtn")?.addEventListener("click", publishPortfolio)
+document.getElementById("adminUpdateBtn")?.addEventListener("click", async () => {
+  try {
+    await ghApi("POST", `/repos/${REPO}/actions/workflows/portfolio-daily.yml/dispatches`, {
+      ref: BRANCH,
+    })
+    adminToast("Update triggered! Check Actions tab.")
+  } catch (err) {
+    adminToast(`Failed: ${err.message}`)
+  }
+})
 
 // ─── INIT ───
 fetchPortfolio()
